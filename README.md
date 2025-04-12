@@ -74,16 +74,16 @@ metalsmith(__dirname)
 
 ## Options
 
-| Option        | Type    | Default           | Description                                                 |
-| ------------- | ------- | ----------------- | ----------------------------------------------------------- |
-| directory     | String  | 'blog'            | Directory containing files to paginate                      |
-| perPage       | Number  | 10                | Number of files per page                                    |
-| sortBy        | String  | 'date'            | Property to sort by (e.g., 'date' or 'post.date')           |
-| reverse       | Boolean | true              | Whether to reverse the sort order (true = newest first)     |
-| outputDir     | String  | ':directory/:num' | Directory pattern for output (supports :directory and :num) |
-| indexLayout   | String  | 'blog-index.njk'  | Layout to use for index pages                               |
+| Option         | Type    | Default           | Description                                                 |
+| -------------- | ------- | ----------------- | ----------------------------------------------------------- |
+| directory      | String  | 'blog'            | Directory containing files to paginate                      |
+| perPage        | Number  | 10                | Number of files per page                                    |
+| sortBy         | String  | 'date'            | Property to sort by (e.g., 'date' or 'post.date')           |
+| reverse        | Boolean | true              | Whether to reverse the sort order (true = newest first)     |
+| outputDir      | String  | ':directory/:num' | Directory pattern for output (supports :directory and :num) |
+| indexLayout    | String  | 'blog-index.njk'  | Layout to use for index pages                               |
 | firstIndexFile | String  | 'blog.md'         | Name of first page file (e.g., 'blog.md')                   |
-| usePermalinks | Boolean | true              | Whether to use permalinks-style URLs (/blog/ vs /blog.html) |
+| usePermalinks  | Boolean | true              | Whether to use permalinks-style URLs (/blog/ vs /blog.html) |
 
 ## How It Works
 

@@ -14,7 +14,7 @@
  * @param {boolean} options.usePermalinks Whether to use permalinks-style URLs
  * @return {Function} Metalsmith plugin function
  */
-export default function simplePagination( options = {} ) {
+export default function simplePagination(options = {}) {
   const defaults = {
     directory: 'blog',
     perPage: 10,
@@ -36,9 +36,9 @@ export default function simplePagination( options = {} ) {
    * @param {string} path - The property path (e.g., 'meta.date')
    * @returns {*} The property value or undefined if not found
    */
-  const getNestedProperty = ( obj, path ) => {
-    const parts = path.split( '.' );
-    return parts.reduce( ( acc, part ) => acc && acc[ part ] !== undefined ? acc[ part ] : undefined, obj );
+  const getNestedProperty = (obj, path) => {
+    const parts = path.split('.');
+    return parts.reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
   };
 
   /**
@@ -46,24 +46,24 @@ export default function simplePagination( options = {} ) {
    * @param {string} path - The path to clean
    * @returns {string} The cleaned URL
    */
-  const createCleanUrl = path => {
+  const createCleanUrl = (path) => {
     // Special handling for index.html files
-    if ( path.endsWith( '/index.html' ) ) {
+    if (path.endsWith('/index.html')) {
       // For index.html files, return the directory path with trailing slash
-      return '/' + path.replace( /\/index\.html$/, '/' );
+      return `/${  path.replace(/\/index\.html$/, '/')}`;
     }
 
     // Remove file extensions (.md, .html, etc.)
-    path = path.replace( /\.(md|html)$/, '' );
+    path = path.replace(/\.(md|html)$/, '');
 
     // Add leading slash if not present
-    if ( !path.startsWith( '/' ) ) {
-      path = `/${ path }`;
+    if (!path.startsWith('/')) {
+      path = `/${path}`;
     }
 
     // Ensure path doesn't end with trailing slash unless it's just "/"
-    if ( path.length > 1 && path.endsWith( '/' ) ) {
-      path = path.slice( 0, -1 );
+    if (path.length > 1 && path.endsWith('/')) {
+      path = path.slice(0, -1);
     }
     return path;
   };
@@ -77,34 +77,56 @@ export default function simplePagination( options = {} ) {
    * @param {boolean} usePermalinks - Whether to use permalinks style URLs
    * @returns {Object} Object containing first, last, next, and previous URLs
    */
-  const generatePaginationUrls = ( directory, outputPattern, pageNum, totalPages, usePermalinks ) => {
+  const generatePaginationUrls = (directory, outputPattern, pageNum, totalPages, usePermalinks) => {
     let firstUrl, lastUrl, nextUrl, prevUrl;
     const directoryPart = directory;
 
     // Helper function to ensure no double slashes
-    const fixUrl = ( url ) => {
-      if ( !url ) return null;
+    const fixUrl = (url) => {
+      if (!url) {return null;}
       // Replace any double slashes with a single slash
-      return url.replace( /\/\//g, '/' );
+      return url.replace(/\/\//g, '/');
     };
 
-    if ( usePermalinks ) {
-      firstUrl = createCleanUrl( `/${ directoryPart }/index.html` );
-      lastUrl = createCleanUrl( `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', totalPages ) }/index.html` );
-      nextUrl = pageNum < totalPages ? createCleanUrl( `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', pageNum + 1 ) }/index.html` ) : null;
-      prevUrl = pageNum > 2 ? createCleanUrl( `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', pageNum - 1 ) }/index.html` ) : pageNum === 2 ? firstUrl : null;
+    if (usePermalinks) {
+      firstUrl = createCleanUrl(`/${directoryPart}/index.html`);
+      lastUrl = createCleanUrl(
+        `/${outputPattern.replace(':directory', directoryPart).replace(':num', totalPages)}/index.html`
+      );
+      nextUrl =
+        pageNum < totalPages
+          ? createCleanUrl(
+              `/${outputPattern.replace(':directory', directoryPart).replace(':num', pageNum + 1)}/index.html`
+            )
+          : null;
+      prevUrl =
+        pageNum > 2
+          ? createCleanUrl(
+              `/${outputPattern.replace(':directory', directoryPart).replace(':num', pageNum - 1)}/index.html`
+            )
+          : pageNum === 2
+            ? firstUrl
+            : null;
     } else {
-      firstUrl = `/${ directoryPart }.html`;
-      lastUrl = `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', totalPages ) }.html`;
-      nextUrl = pageNum < totalPages ? `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', pageNum + 1 ) }.html` : null;
-      prevUrl = pageNum > 2 ? `/${ outputPattern.replace( ':directory', directoryPart ).replace( ':num', pageNum - 1 ) }.html` : pageNum === 2 ? firstUrl : null;
+      firstUrl = `/${directoryPart}.html`;
+      lastUrl = `/${outputPattern.replace(':directory', directoryPart).replace(':num', totalPages)}.html`;
+      nextUrl =
+        pageNum < totalPages
+          ? `/${outputPattern.replace(':directory', directoryPart).replace(':num', pageNum + 1)}.html`
+          : null;
+      prevUrl =
+        pageNum > 2
+          ? `/${outputPattern.replace(':directory', directoryPart).replace(':num', pageNum - 1)}.html`
+          : pageNum === 2
+            ? firstUrl
+            : null;
     }
 
     return {
-      firstUrl: fixUrl( firstUrl ),
-      lastUrl: fixUrl( lastUrl ),
-      nextUrl: fixUrl( nextUrl ),
-      prevUrl: fixUrl( prevUrl )
+      firstUrl: fixUrl(firstUrl),
+      lastUrl: fixUrl(lastUrl),
+      nextUrl: fixUrl(nextUrl),
+      prevUrl: fixUrl(prevUrl)
     };
   };
 
@@ -114,17 +136,17 @@ export default function simplePagination( options = {} ) {
    * @param {string} sortBy - The property to get date from
    * @returns {Date} The most recent date or current date if none found
    */
-  const findMostRecentDate = ( pageFiles, sortBy ) => {
+  const findMostRecentDate = (pageFiles, sortBy) => {
     let mostRecentDate = null;
-    for ( const file of pageFiles ) {
-      const fileDate = getNestedProperty( file, sortBy );
-      if ( fileDate && fileDate instanceof Date ) {
+    for (const file of pageFiles) {
+      const fileDate = getNestedProperty(file, sortBy);
+      if (fileDate && fileDate instanceof Date) {
         mostRecentDate = fileDate;
         break;
-      } else if ( fileDate && typeof fileDate === 'string' ) {
+      } else if (fileDate && typeof fileDate === 'string') {
         // Try to parse the date string
-        const parsedDate = new Date( fileDate );
-        if ( !isNaN( parsedDate.getTime() ) ) {
+        const parsedDate = new Date(fileDate);
+        if (!isNaN(parsedDate.getTime())) {
           mostRecentDate = parsedDate;
           break;
         }
@@ -132,7 +154,7 @@ export default function simplePagination( options = {} ) {
     }
 
     // If we couldn't find a valid date, use current date
-    if ( !mostRecentDate ) {
+    if (!mostRecentDate) {
       mostRecentDate = new Date();
     }
     return mostRecentDate;
@@ -144,16 +166,16 @@ export default function simplePagination( options = {} ) {
    * @param {string} newPath - The new path for the file
    * @returns {Object} File details without contents and with clean URL path
    */
-  const createFileDetails = ( fileData, newPath ) => {
+  const createFileDetails = (fileData, newPath) => {
     const fileDetail = {
       ...fileData
     };
     delete fileDetail.contents; // Contents not needed in the metadata
 
     // Fix the path to ensure it doesn't end with just 'index'
-    let cleanPath = createCleanUrl( newPath );
-    if ( cleanPath.endsWith( '/index' ) ) {
-      cleanPath = cleanPath.replace( /\/index$/, '/' );
+    let cleanPath = createCleanUrl(newPath);
+    if (cleanPath.endsWith('/index')) {
+      cleanPath = cleanPath.replace(/\/index$/, '/');
     }
     fileDetail.path = cleanPath;
 
@@ -171,11 +193,11 @@ export default function simplePagination( options = {} ) {
    * @param {function} debug - The debug function
    * @returns {void}
    */
-  const moveFile = ( files, fileData, oldPath, newPath, pageNum, totalPages, debug ) => {
-    debug( 'Moving file from %s to %s', oldPath, newPath );
+  const moveFile = (files, fileData, oldPath, newPath, pageNum, totalPages, debug) => {
+    debug('Moving file from %s to %s', oldPath, newPath);
 
     // Create a new file entry with the updated path
-    files[ newPath ] = {
+    files[newPath] = {
       ...fileData,
       originalPath: oldPath,
       pageNumber: pageNum,
@@ -183,7 +205,7 @@ export default function simplePagination( options = {} ) {
     };
 
     // Remove the old file entry
-    delete files[ oldPath ];
+    delete files[oldPath];
   };
 
   /**
@@ -193,39 +215,41 @@ export default function simplePagination( options = {} ) {
    * @param {function} debug - The debug function
    * @returns {Array} The filtered and sorted files
    */
-  const filterAndSortFiles = ( files, opts, debug ) => {
+  const filterAndSortFiles = (files, opts, debug) => {
     // Filter files to only those in the specified directory
-    const targetFiles = Object.keys( files ).filter( file => file.startsWith( `${ opts.directory }/` ) ).map( file => ( {
-      path: file,
-      ...files[ file ]
-    } ) );
-    debug( 'Found %d files in directory %s', targetFiles.length, opts.directory );
-    if ( targetFiles.length === 0 ) {
+    const targetFiles = Object.keys(files)
+      .filter((file) => file.startsWith(`${opts.directory}/`))
+      .map((file) => ({
+        path: file,
+        ...files[file]
+      }));
+    debug('Found %d files in directory %s', targetFiles.length, opts.directory);
+    if (targetFiles.length === 0) {
       return [];
     }
 
     // Sort the files, supporting nested properties
-    targetFiles.sort( ( a, b ) => {
-      const aVal = getNestedProperty( a, opts.sortBy );
-      const bVal = getNestedProperty( b, opts.sortBy );
-      if ( aVal === undefined && bVal === undefined ) {
+    targetFiles.sort((a, b) => {
+      const aVal = getNestedProperty(a, opts.sortBy);
+      const bVal = getNestedProperty(b, opts.sortBy);
+      if (aVal === undefined && bVal === undefined) {
         return 0;
       }
-      if ( aVal === undefined ) {
+      if (aVal === undefined) {
         return opts.reverse ? -1 : 1;
       }
-      if ( bVal === undefined ) {
+      if (bVal === undefined) {
         return opts.reverse ? 1 : -1;
       }
-      if ( aVal < bVal ) {
+      if (aVal < bVal) {
         return opts.reverse ? 1 : -1;
       }
-      if ( aVal > bVal ) {
+      if (aVal > bVal) {
         return opts.reverse ? -1 : 1;
       }
       return 0;
-    } );
-    debug( 'Files sorted by %s in %s order', opts.sortBy, opts.reverse ? 'descending' : 'ascending' );
+    });
+    debug('Files sorted by %s in %s order', opts.sortBy, opts.reverse ? 'descending' : 'ascending');
     return targetFiles;
   };
 
@@ -241,7 +265,16 @@ export default function simplePagination( options = {} ) {
    * @param {string} lastUrl - The last page URL
    * @returns {Object} The pagination metadata
    */
-  const createPaginationMetadata = ( directory, pageNum, totalPages, fileDetails, nextUrl, prevUrl, firstUrl, lastUrl ) => {
+  const createPaginationMetadata = (
+    directory,
+    pageNum,
+    totalPages,
+    fileDetails,
+    nextUrl,
+    prevUrl,
+    firstUrl,
+    lastUrl
+  ) => {
     return {
       name: directory,
       num: pageNum,
@@ -264,33 +297,33 @@ export default function simplePagination( options = {} ) {
    * @param {Object} metadata - The global metadata
    * @param {function} debug - The debug function
    */
-  const processPage = ( files, pageFiles, pageNum, totalPages, opts, metadata, debug ) => {
+  const processPage = (files, pageFiles, pageNum, totalPages, opts, metadata, debug) => {
     // Determine page path
-    const pagePath = opts.outputDir.replace( ':directory', opts.directory ).replace( ':num', pageNum );
-    const indexFile = `${ pagePath }/index.html`;
-    debug( 'Processing page %d with path: %s', pageNum, pagePath );
+    const pagePath = opts.outputDir.replace(':directory', opts.directory).replace(':num', pageNum);
+    const indexFile = `${pagePath}/index.html`;
+    debug('Processing page %d with path: %s', pageNum, pagePath);
     const fileDetails = [];
 
     // Move files to their new locations
-    pageFiles.forEach( fileData => {
+    pageFiles.forEach((fileData) => {
       const oldPath = fileData.path;
-      const fileName = oldPath.split( '/' ).pop();
+      const fileName = oldPath.split('/').pop();
       // Get the basename without extension
-      const baseName = fileName.replace( /\.[^/.]+$/, "" );
+      const baseName = fileName.replace(/\.[^/.]+$/, '');
       // Get the original extension
-      const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
+      const extension = fileName.match(/\.[^/.]+$/) ? fileName.match(/\.[^/.]+$/)[0] : '.html';
       // Create a directory for each blog post
-      const newPath = `${ opts.directory }/${ baseName }/index${ extension }`;
+      const newPath = `${opts.directory}/${baseName}/index${extension}`;
 
       // Create a new file entry with the updated path
-      moveFile( files, fileData, oldPath, newPath, pageNum, totalPages, debug );
+      moveFile(files, fileData, oldPath, newPath, pageNum, totalPages, debug);
 
       // Create detailed file data (excluding contents)
-      fileDetails.push( createFileDetails( fileData, newPath ) );
-    } );
+      fileDetails.push(createFileDetails(fileData, newPath));
+    });
 
     // Get the most recent date from the files on this page
-    const mostRecentDate = findMostRecentDate( pageFiles, opts.sortBy );
+    const mostRecentDate = findMostRecentDate(pageFiles, opts.sortBy);
 
     // Create file stats similar to what Metalsmith would provide
     const now = new Date();
@@ -302,19 +335,36 @@ export default function simplePagination( options = {} ) {
     };
 
     // Generate clean URLs for pagination
-    const {
+    const { firstUrl, lastUrl, nextUrl, prevUrl } = generatePaginationUrls(
+      opts.directory,
+      opts.outputDir,
+      pageNum,
+      totalPages,
+      opts.usePermalinks
+    );
+    debug(
+      'Pagination URLs for page %d: first=%s, prev=%s, next=%s, last=%s',
+      pageNum,
       firstUrl,
-      lastUrl,
+      prevUrl,
       nextUrl,
-      prevUrl
-    } = generatePaginationUrls( opts.directory, opts.outputDir, pageNum, totalPages, opts.usePermalinks );
-    debug( 'Pagination URLs for page %d: first=%s, prev=%s, next=%s, last=%s', pageNum, firstUrl, prevUrl, nextUrl, lastUrl );
+      lastUrl
+    );
 
     // Create pagination metadata
-    const paginationMetadata = createPaginationMetadata( opts.directory, pageNum, totalPages, fileDetails, nextUrl, prevUrl, firstUrl, lastUrl );
+    const paginationMetadata = createPaginationMetadata(
+      opts.directory,
+      pageNum,
+      totalPages,
+      fileDetails,
+      nextUrl,
+      prevUrl,
+      firstUrl,
+      lastUrl
+    );
 
     // Create index file for this page with pagination metadata compatible with metalsmith-pagination
-    files[ indexFile ] = {
+    files[indexFile] = {
       pagination: paginationMetadata,
       // Add for backward compatibility with our plugin
       pageFiles: fileDetails,
@@ -323,11 +373,11 @@ export default function simplePagination( options = {} ) {
       // Add file stats
       stats: fileStats,
       // Include global metadata if available
-      ...( metadata || {} ),
+      ...(metadata || {}),
       layout: opts.indexLayout,
-      contents: Buffer.from( '' )
+      contents: Buffer.from('')
     };
-    debug( 'Created index file: %s', indexFile );
+    debug('Created index file: %s', indexFile);
   };
 
   /**
@@ -338,120 +388,129 @@ export default function simplePagination( options = {} ) {
    * @param {Object} opts - The plugin options
    * @param {function} debug - The debug function
    */
-  const processFirstPage = ( files, firstIndexFiles, totalPages, opts, debug ) => {
-    debug( 'Processing first page with %d files', firstIndexFiles.length );
+  const processFirstPage = (files, firstIndexFiles, totalPages, opts, debug) => {
+    debug('Processing first page with %d files', firstIndexFiles.length);
     const fileDetails = [];
 
     // IMPORTANT: Create detailed file data WITH updated paths
-    firstIndexFiles.forEach( fileData => {
+    firstIndexFiles.forEach((fileData) => {
       const oldPath = fileData.path;
-      const fileName = oldPath.split( '/' ).pop();
+      const fileName = oldPath.split('/').pop();
       // Get the basename without extension
-      const baseName = fileName.replace( /\.[^/.]+$/, "" );
+      const baseName = fileName.replace(/\.[^/.]+$/, '');
       // Get the original extension
-      const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
+      const extension = fileName.match(/\.[^/.]+$/) ? fileName.match(/\.[^/.]+$/)[0] : '.html';
       // Create a directory for each blog post
-      const newPath = `${ opts.directory }/${ baseName }/index${ extension }`;
+      const newPath = `${opts.directory}/${baseName}/index${extension}`;
 
       // Create detailed file data (excluding contents)
-      fileDetails.push( createFileDetails( fileData, newPath ) );
-    } );
+      fileDetails.push(createFileDetails(fileData, newPath));
+    });
 
     // Move files for the first page to the blog directory
-    firstIndexFiles.forEach( fileData => {
+    firstIndexFiles.forEach((fileData) => {
       const oldPath = fileData.path;
-      const fileName = oldPath.split( '/' ).pop();
+      const fileName = oldPath.split('/').pop();
       // Get the basename without extension
-      const baseName = fileName.replace( /\.[^/.]+$/, "" );
+      const baseName = fileName.replace(/\.[^/.]+$/, '');
       // Get the original extension
-      const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
+      const extension = fileName.match(/\.[^/.]+$/) ? fileName.match(/\.[^/.]+$/)[0] : '.html';
       // Create a directory for each blog post
-      const newPath = `${ opts.directory }/${ baseName }/index${ extension }`;
+      const newPath = `${opts.directory}/${baseName}/index${extension}`;
 
       // Create a new file entry with the updated path
-      moveFile( files, fileData, oldPath, newPath, 1, totalPages, debug );
-    } );
+      moveFile(files, fileData, oldPath, newPath, 1, totalPages, debug);
+    });
 
     // Generate clean URLs for first page pagination (no previous URL needed)
-    const {
-      firstUrl,
-      lastUrl,
-      nextUrl
-    } = generatePaginationUrls( opts.directory, opts.outputDir, 1, totalPages, opts.usePermalinks );
-    debug( 'Pagination URLs for first page: first=%s, next=%s, last=%s', firstUrl, nextUrl, lastUrl );
+    const { firstUrl, lastUrl, nextUrl } = generatePaginationUrls(
+      opts.directory,
+      opts.outputDir,
+      1,
+      totalPages,
+      opts.usePermalinks
+    );
+    debug('Pagination URLs for first page: first=%s, next=%s, last=%s', firstUrl, nextUrl, lastUrl);
 
     // Update the metadata for the first page file if it exists
-    if ( files[ opts.firstIndexFile ] ) {
-      debug( 'Adding pagination metadata to first page file: %s', opts.firstIndexFile );
+    if (files[opts.firstIndexFile]) {
+      debug('Adding pagination metadata to first page file: %s', opts.firstIndexFile);
 
       // Get the most recent date from the files on this page
-      const mostRecentDate = findMostRecentDate( firstIndexFiles, opts.sortBy );
+      const mostRecentDate = findMostRecentDate(firstIndexFiles, opts.sortBy);
 
       // Create pagination metadata
-      const paginationMetadata = createPaginationMetadata( opts.directory, 1, totalPages, fileDetails, nextUrl, null,
+      const paginationMetadata = createPaginationMetadata(
+        opts.directory,
+        1,
+        totalPages,
+        fileDetails,
+        nextUrl,
+        null,
         // No previous page for first page
-        firstUrl, lastUrl );
+        firstUrl,
+        lastUrl
+      );
 
       // Add pagination metadata to the existing file in metalsmith-pagination format
-      files[ opts.firstIndexFile ].pagination = paginationMetadata;
+      files[opts.firstIndexFile].pagination = paginationMetadata;
 
       // Add for backward compatibility with our plugin
-      files[ opts.firstIndexFile ].pageFiles = fileDetails;
+      files[opts.firstIndexFile].pageFiles = fileDetails;
 
       // Update date if needed
-      if ( !files[ opts.firstIndexFile ].date ) {
-        files[ opts.firstIndexFile ].date = mostRecentDate;
+      if (!files[opts.firstIndexFile].date) {
+        files[opts.firstIndexFile].date = mostRecentDate;
       }
     } else {
-      debug( 'First page file %s does not exist, skipping first page metadata update', opts.firstIndexFile );
+      debug('First page file %s does not exist, skipping first page metadata update', opts.firstIndexFile);
     }
   };
 
   // The main plugin function
-  return function( files, metalsmith, done ) {
+  return function (files, metalsmith, done) {
     try {
       // Support metalsmith debug or create a dummy function if not available
-      const debug = metalsmith.debug ? metalsmith.debug( 'metalsmith-simple-pagination' ) : () => { };
-      debug( 'Starting pagination process with options: %o', opts );
+      const debug = metalsmith.debug ? metalsmith.debug('metalsmith-simple-pagination') : () => {};
+      debug('Starting pagination process with options: %o', opts);
 
       // Get metadata from metalsmith
       const metadata = metalsmith.metadata();
 
       // Filter and sort the files
-      const targetFiles = filterAndSortFiles( files, opts, debug );
+      const targetFiles = filterAndSortFiles(files, opts, debug);
 
       // If no files found, skip pagination
-      if ( targetFiles.length === 0 ) {
-        debug( 'No files found in directory %s, skipping pagination', opts.directory );
+      if (targetFiles.length === 0) {
+        debug('No files found in directory %s, skipping pagination', opts.directory);
         return done();
       }
 
       // Group files into chunks for pages
       const pages = [];
-      for ( let i = 0; i < targetFiles.length; i += opts.perPage ) {
-        pages.push( targetFiles.slice( i, i + opts.perPage ) );
+      for (let i = 0; i < targetFiles.length; i += opts.perPage) {
+        pages.push(targetFiles.slice(i, i + opts.perPage));
       }
-      debug( 'Created %d pages with %d items per page', pages.length, opts.perPage );
+      debug('Created %d pages with %d items per page', pages.length, opts.perPage);
 
       // Create paginated directories and add pagination metadata for pages after the first
-      for ( let index = 1; index < pages.length; index++ ) {
-        const pageFiles = pages[ index ];
+      for (let index = 1; index < pages.length; index++) {
+        const pageFiles = pages[index];
         const pageNum = index + 1; // Start at 2
-        processPage( files, pageFiles, pageNum, pages.length, opts, metadata, debug );
+        processPage(files, pageFiles, pageNum, pages.length, opts, metadata, debug);
       }
 
       // Handle the first page
-      if ( pages.length > 0 ) {
-        const firstIndexFiles = pages[ 0 ];
-        processFirstPage( files, firstIndexFiles, pages.length, opts, debug );
+      if (pages.length > 0) {
+        const firstIndexFiles = pages[0];
+        processFirstPage(files, firstIndexFiles, pages.length, opts, debug);
       }
-      debug( 'Pagination process completed' );
+      debug('Pagination process completed');
       done();
-    } catch ( error ) {
+    } catch (error) {
       // Handle unexpected errors
-      console.error( 'Error in metalsmith-simple-pagination plugin:', error );
-      done( error );
+      console.error('Error in metalsmith-simple-pagination plugin:', error);
+      done(error);
     }
   };
 }
-
