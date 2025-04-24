@@ -249,6 +249,40 @@ const createPaginationMetadata = ( directory, pageNum, totalPages, fileDetails, 
 };
 
 /**
+ * Helper function to process files for a page
+ * @param {Object} files - The Metalsmith files object
+ * @param {Array} pageFiles - The files for this page
+ * @param {string} directory - The directory containing files
+ * @param {number} pageNum - The page number
+ * @param {number} totalPages - The total number of pages
+ * @param {function} debug - The debug function
+ * @returns {Array} Array of file details
+ */
+const processPageFiles = ( files, pageFiles, directory, pageNum, totalPages, debug ) => {
+  const fileDetails = [];
+
+  // Process each file in the page
+  pageFiles.forEach( ( fileData ) => {
+    const oldPath = fileData.path;
+    const fileName = oldPath.split( '/' ).pop();
+    // Get the basename without extension
+    const baseName = fileName.replace( /\.[^/.]+$/, '' );
+    // Get the original extension
+    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
+    // Create a directory for each blog post
+    const newPath = `${ directory }/${ baseName }/index${ extension }`;
+
+    // Create a new file entry with the updated path
+    moveFile( files, fileData, oldPath, newPath, pageNum, totalPages, debug );
+
+    // Create detailed file data (excluding contents)
+    fileDetails.push( createFileDetails( fileData, newPath ) );
+  } );
+
+  return fileDetails;
+};
+
+/**
  * Process a non-first page
  * @param {Object} files - The Metalsmith files object
  * @param {Array} pageFiles - The files for this page
@@ -263,25 +297,9 @@ const processPage = ( files, pageFiles, pageNum, totalPages, options, metadata, 
   const pagePath = options.outputDir.replace( ':directory', options.directory ).replace( ':num', pageNum );
   const indexFile = `${ pagePath }/index.html`;
   debug( 'Processing page %d with path: %s', pageNum, pagePath );
-  const fileDetails = [];
 
-  // Move files to their new locations
-  pageFiles.forEach( ( fileData ) => {
-    const oldPath = fileData.path;
-    const fileName = oldPath.split( '/' ).pop();
-    // Get the basename without extension
-    const baseName = fileName.replace( /\.[^/.]+$/, '' );
-    // Get the original extension
-    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
-    // Create a directory for each blog post
-    const newPath = `${ options.directory }/${ baseName }/index${ extension }`;
-
-    // Create a new file entry with the updated path
-    moveFile( files, fileData, oldPath, newPath, pageNum, totalPages, debug );
-
-    // Create detailed file data (excluding contents)
-    fileDetails.push( createFileDetails( fileData, newPath ) );
-  } );
+  // Process files and get file details
+  const fileDetails = processPageFiles( files, pageFiles, options.directory, pageNum, totalPages, debug );
 
   // Get the most recent date from the files on this page
   const mostRecentDate = findMostRecentDate( pageFiles, options.sortBy );
@@ -351,37 +369,9 @@ const processPage = ( files, pageFiles, pageNum, totalPages, options, metadata, 
  */
 const processFirstPage = ( files, firstIndexFiles, totalPages, options, debug ) => {
   debug( 'Processing first page with %d files', firstIndexFiles.length );
-  const fileDetails = [];
 
-  // IMPORTANT: Create detailed file data WITH updated paths
-  firstIndexFiles.forEach( ( fileData ) => {
-    const oldPath = fileData.path;
-    const fileName = oldPath.split( '/' ).pop();
-    // Get the basename without extension
-    const baseName = fileName.replace( /\.[^/.]+$/, '' );
-    // Get the original extension
-    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
-    // Create a directory for each blog post
-    const newPath = `${ options.directory }/${ baseName }/index${ extension }`;
-
-    // Create detailed file data (excluding contents)
-    fileDetails.push( createFileDetails( fileData, newPath ) );
-  } );
-
-  // Move files for the first page to the blog directory
-  firstIndexFiles.forEach( ( fileData ) => {
-    const oldPath = fileData.path;
-    const fileName = oldPath.split( '/' ).pop();
-    // Get the basename without extension
-    const baseName = fileName.replace( /\.[^/.]+$/, '' );
-    // Get the original extension
-    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
-    // Create a directory for each blog post
-    const newPath = `${ options.directory }/${ baseName }/index${ extension }`;
-
-    // Create a new file entry with the updated path
-    moveFile( files, fileData, oldPath, newPath, 1, totalPages, debug );
-  } );
+  // Process files and get file details
+  const fileDetails = processPageFiles( files, firstIndexFiles, options.directory, 1, totalPages, debug );
 
   // Generate clean URLs for first page pagination (no previous URL needed)
   const { firstUrl, lastUrl, nextUrl } = generatePaginationUrls(
@@ -407,8 +397,7 @@ const processFirstPage = ( files, firstIndexFiles, totalPages, options, debug ) 
       totalPages,
       fileDetails,
       nextUrl,
-      null,
-      // No previous page for first page
+      null, // No previous page for first page
       firstUrl,
       lastUrl
     );
@@ -460,7 +449,6 @@ const defaults = {
 function normalizeOptions( options ) {
   return Object.assign( {}, defaults, options || {} );
 }
-
 
 /**
  * Simple pagination plugin for Metalsmith

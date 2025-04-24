@@ -24,6 +24,7 @@ export default [
           argsIgnorePattern: '^_'
         }
       ],
+      'space-in-parens': ['error', 'always'],
       eqeqeq: ['error', 'always'],
       curly: ['error', 'all'],
       'dot-notation': 'error',
