@@ -64,7 +64,9 @@ export const findMostRecentDate = ( files, sortBy ) => {
  * @returns {*} The value of the property or undefined if not found
  */
 export const getNestedProperty = ( obj, propertyPath ) => {
-  if ( !propertyPath ) {return undefined;}
+  if ( !propertyPath ) {
+    return undefined;
+  }
   const parts = propertyPath.split( '.' );
   let current = obj;
 
@@ -95,7 +97,7 @@ export const createCleanUrl = ( path, usePermalinks = true ) => {
 
   // Ensure the path starts with a slash
   if ( !normalizedPath.startsWith( '/' ) ) {
-    normalizedPath = `/${  normalizedPath}`;
+    normalizedPath = `/${normalizedPath}`;
   }
   return normalizedPath;
 };
