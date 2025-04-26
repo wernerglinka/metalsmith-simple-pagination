@@ -8,18 +8,21 @@
  * @param {string} prevUrl - URL to the previous page
  * @param {string} firstUrl - URL to the first page
  * @param {string} lastUrl - URL to the last page
+ * @param {boolean} usePermalinks - Whether to use permalinks-style URLs
  * @returns {Object} Pagination metadata
  */
-export const createPaginationMetadata = ( directory, pageNum, totalPages, files, nextUrl, prevUrl, firstUrl, lastUrl ) => {
+export const createPaginationMetadata = ( directory, pageNum, totalPages, files, nextUrl, prevUrl, firstUrl, lastUrl, usePermalinks = true ) => {
   return {
     name: directory,
     num: pageNum,
     total: totalPages,
+    pages: totalPages, // Add pages property for compatibility with metalsmith-pagination
     files: files,
     next: nextUrl || null,
     previous: prevUrl || null,
     first: firstUrl,
-    last: lastUrl
+    last: lastUrl,
+    usePermalinks: usePermalinks // Add flag to indicate URL style for templates
   };
 };
 
@@ -47,12 +50,12 @@ export const findMostRecentDate = ( files, sortBy ) => {
 /**
  * Helper function to get a nested property from an object
  * @param {Object} obj - The object to get the property from
- * @param {string} path - The path to the property (e.g., 'post.date')
+ * @param {string} propertyPath - The path to the property (e.g., 'post.date')
  * @returns {*} The value of the property or undefined if not found
  */
-export const getNestedProperty = ( obj, path ) => {
-  if ( !path ) return undefined;
-  const parts = path.split( '.' );
+export const getNestedProperty = ( obj, propertyPath ) => {
+  if ( !propertyPath ) return undefined;
+  const parts = propertyPath.split( '.' );
   let current = obj;
 
   for ( const part of parts ) {
@@ -68,18 +71,23 @@ export const getNestedProperty = ( obj, path ) => {
 /**
  * Create a clean URL from a file path
  * @param {string} path - The file path
- * @returns {string} The clean URL
+ * @param {boolean} usePermalinks - Whether to use permalinks-style URLs
+ * @returns {string} The normalized and clean URL
  */
-export const createCleanUrl = ( path ) => {
+export const createCleanUrl = ( path, usePermalinks = true ) => {
   // Remove index.html from the end of the path
-  let cleanPath = path.replace( /\/index\.html$/, '/' );
-  // Remove .html from the end of the path
-  cleanPath = cleanPath.replace( /\.html$/, '' );
-  // Ensure the path starts with a slash
-  if ( !cleanPath.startsWith( '/' ) ) {
-    cleanPath = '/' + cleanPath;
+  let normalizedPath = path.replace( /\/index\.html$/, '/' );
+
+  if ( usePermalinks ) {
+    // Remove .html from the end of the path for permalink style
+    normalizedPath = normalizedPath.replace( /\.html$/, '' );
   }
-  return cleanPath;
+
+  // Ensure the path starts with a slash
+  if ( !normalizedPath.startsWith( '/' ) ) {
+    normalizedPath = '/' + normalizedPath;
+  }
+  return normalizedPath;
 };
 
 /**
@@ -95,18 +103,26 @@ export const generatePaginationUrls = ( directory, outputDir, pageNum, totalPage
   // Format URLs based on permalink style
   let firstUrl, lastUrl, nextUrl, prevUrl;
 
+  // Replace tokens in outputDir pattern
+  const getPagePath = ( num ) => {
+    if ( num === 1 ) {
+      return directory;
+    }
+    return outputDir.replace( ':directory', directory ).replace( ':num', num );
+  };
+
   if ( usePermalinks ) {
     // Permalink style: /blog/, /blog/2/
-    firstUrl = `/${ directory }/`;
-    lastUrl = `/${ directory }/${ totalPages }/`;
-    nextUrl = pageNum < totalPages ? `/${ directory }/${ pageNum + 1 }/` : null;
-    prevUrl = pageNum > 1 ? ( pageNum === 2 ? `/${ directory }/` : `/${ directory }/${ pageNum - 1 }/` ) : null;
+    firstUrl = `/${ getPagePath( 1 ) }/`;
+    lastUrl = `/${ getPagePath( totalPages ) }/`;
+    nextUrl = pageNum < totalPages ? `/${ getPagePath( pageNum + 1 ) }/` : null;
+    prevUrl = pageNum > 1 ? `/${ getPagePath( pageNum - 1 ) }/` : null;
   } else {
     // Non-permalink style: /blog.html, /blog/2.html
-    firstUrl = `/${ directory }.html`;
-    lastUrl = pageNum === totalPages ? `/${ directory }/${ totalPages }.html` : `/${ directory }/${ totalPages }.html`;
-    nextUrl = pageNum < totalPages ? `/${ directory }/${ pageNum + 1 }.html` : null;
-    prevUrl = pageNum > 1 ? ( pageNum === 2 ? `/${ directory }.html` : `/${ directory }/${ pageNum - 1 }.html` ) : null;
+    firstUrl = `/${ getPagePath( 1 ) }.html`;
+    lastUrl = `/${ getPagePath( totalPages ) }.html`;
+    nextUrl = pageNum < totalPages ? `/${ getPagePath( pageNum + 1 ) }.html` : null;
+    prevUrl = pageNum > 1 ? `/${ getPagePath( pageNum - 1 ) }.html` : null;
   }
 
   return { firstUrl, lastUrl, nextUrl, prevUrl };
@@ -114,22 +130,35 @@ export const generatePaginationUrls = ( directory, outputDir, pageNum, totalPage
 
 /**
  * Helper function to create file details for pagination metadata
- * @param {Object} fileData - The file data
+ * @param {Object} pageFile - The file data
  * @param {string} newPath - The new path for the file
+ * @param {boolean} usePermalinks - Whether to use permalinks-style URLs
  * @returns {Object} File details without contents and with clean URL path
  */
-export const createFileDetails = ( fileData, newPath ) => {
+export const createFileDetails = ( pageFile, newPath, usePermalinks = true ) => {
   const fileDetail = {
-    ...fileData
+    ...pageFile
   };
   delete fileDetail.contents; // Contents not needed in the metadata
 
-  // Fix the path to ensure it doesn't end with just 'index'
-  let cleanPath = createCleanUrl( newPath );
-  if ( cleanPath.endsWith( '/index' ) ) {
-    cleanPath = cleanPath.replace( /\/index$/, '/' );
+  // Convert markdown paths to html paths and format according to usePermalinks
+  // First, replace any .md extension with .html
+  let normalizedPath = newPath.replace( /\.md$/, '.html' );
+
+  // Then apply clean URL formatting based on usePermalinks
+  normalizedPath = createCleanUrl( normalizedPath, usePermalinks );
+
+  // Fix paths that end with /index
+  if ( normalizedPath.endsWith( '/index' ) ) {
+    normalizedPath = normalizedPath.replace( /\/index$/, '/' );
   }
-  fileDetail.path = cleanPath;
+
+  // For non-permalink style, ensure .html extension is present
+  if ( !usePermalinks && !normalizedPath.endsWith( '.html' ) ) {
+    normalizedPath = `${ normalizedPath }.html`;
+  }
+
+  fileDetail.path = normalizedPath;
 
   return fileDetail;
 };

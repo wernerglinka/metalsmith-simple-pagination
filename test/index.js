@@ -13,7 +13,7 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) );
  * @param {string} dir - The fixture directory name
  * @returns {Function} A function that resolves paths within the fixture directory
  */
-const getFixturePath = ( dir ) => resolve.bind( null, __dirname, `fixtures/${dir}` );
+const getFixturePath = ( dir ) => resolve.bind( null, __dirname, `fixtures/${ dir }` );
 
 // Get fixture path resolver
 getFixturePath;
@@ -21,7 +21,7 @@ getFixturePath;
 // Import metalsmith
 import Metalsmith from 'metalsmith';
 
-describe( 'metalsmith-simple-pagination (ESM)', function () {
+describe( 'metalsmith-simple-pagination (ESM)', function() {
   // Set timeout for all tests
   this.timeout( 5000 );
 
@@ -103,9 +103,9 @@ describe( 'metalsmith-simple-pagination (ESM)', function () {
 
         try {
           // Check pagination URLs use .html format
-          assert.strictEqual( files['blog.md'].pagination.next, '/blog/2.html' );
-          assert.strictEqual( files['blog/2/index.html'].pagination.previous, '/blog.html' );
-          assert.strictEqual( files['blog/2/index.html'].pagination.first, '/blog.html' );
+          assert.strictEqual( files[ 'blog.md' ].pagination.next, '/blog/2.html' );
+          assert.strictEqual( files[ 'blog/2.html' ].pagination.previous, '/blog.html' );
+          assert.strictEqual( files[ 'blog/2.html' ].pagination.first, '/blog.html' );
 
           done();
         } catch ( error ) {
@@ -146,10 +146,10 @@ describe( 'metalsmith-simple-pagination (ESM)', function () {
 
         try {
           // Check that custom-blog-index.md got pagination metadata
-          assert( files['custom-blog-index.md'].pagination !== undefined, 'pagination should exist' );
-          assert.strictEqual( files['custom-blog-index.md'].pagination.num, 1 );
-          assert( Array.isArray( files['custom-blog-index.md'].pagination.files ), 'pagination.files should be an array' );
-          assert.strictEqual( files['custom-blog-index.md'].pagination.files.length, 2 );
+          assert( files[ 'custom-blog-index.md' ].pagination !== undefined, 'pagination should exist' );
+          assert.strictEqual( files[ 'custom-blog-index.md' ].pagination.num, 1 );
+          assert( Array.isArray( files[ 'custom-blog-index.md' ].pagination.files ), 'pagination.files should be an array' );
+          assert.strictEqual( files[ 'custom-blog-index.md' ].pagination.files.length, 2 );
 
           done();
         } catch ( error ) {
@@ -182,9 +182,9 @@ describe( 'metalsmith-simple-pagination (ESM)', function () {
 
         try {
           // No blog files should be created or moved
-          assert( files['other/file.md'] !== undefined, 'other/file.md should exist' );
-          assert( files['blog.md'] !== undefined, 'blog.md should exist' );
-          assert( files['blog.md'].pagination === undefined, 'blog.md should not have pagination metadata' );
+          assert( files[ 'other/file.md' ] !== undefined, 'other/file.md should exist' );
+          assert( files[ 'blog.md' ] !== undefined, 'blog.md should exist' );
+          assert( files[ 'blog.md' ].pagination === undefined, 'blog.md should not have pagination metadata' );
 
           done();
         } catch ( error ) {
@@ -229,8 +229,8 @@ describe( 'metalsmith-simple-pagination (ESM)', function () {
 
         try {
           // Check global metadata was added to index pages
-          assert.strictEqual( files['blog/2/index.html'].siteName, 'Test Site' );
-          assert.strictEqual( files['blog/2/index.html'].siteUrl, 'https://example.com' );
+          assert.strictEqual( files[ 'blog/2/index.html' ].siteName, 'Test Site' );
+          assert.strictEqual( files[ 'blog/2/index.html' ].siteUrl, 'https://example.com' );
 
           done();
         } catch ( error ) {

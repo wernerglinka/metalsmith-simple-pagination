@@ -8,35 +8,49 @@ import { findMostRecentDate, generatePaginationUrls, createPaginationMetadata, c
  * @param {string} directory - The directory containing files
  * @param {number} pageNum - The page number
  * @param {number} totalPages - The total number of pages
+ * @param {Object} options - The plugin options
  * @param {function} debug - The debug function
  * @returns {Array} Array of file details
  */
-export const processPageFiles = ( files, pageFiles, directory, pageNum, totalPages, debug ) => {
+export const processPageFiles = ( files, pageFiles, directory, pageNum, totalPages, options, debug ) => {
   const fileDetails = [];
 
   // Process each file in the page
-  pageFiles.forEach( ( fileData ) => {
-    const oldPath = fileData.path;
+  pageFiles.forEach( ( pageFile ) => {
+    const oldPath = pageFile.path;
     const fileName = oldPath.split( '/' ).pop();
     // Get the basename without extension
     const baseName = fileName.replace( /\.[^/.]+$/, '' );
     // Get the original extension
     const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
-    // Create a directory for each blog post
-    const newPath = `${ directory }/${ baseName }/index${ extension }`;
+
+    let newPath;
+    if ( options.usePermalinks ) {
+      // Create a directory for each blog post (permalink style)
+      newPath = `${ directory }/${ baseName }/index${ extension }`;
+    } else {
+      // Keep the original path (non-permalink style)
+      newPath = oldPath;
+    }
 
     // Create a new file entry with the updated path
-    moveFile( files, fileData, oldPath, newPath, pageNum, totalPages, debug );
+    if ( newPath !== oldPath ) {
+      moveFile( files, pageFile, oldPath, newPath, pageNum, totalPages, debug );
+    } else {
+      // Just add pagination metadata without moving the file
+      files[ oldPath ].pageNumber = pageNum;
+      files[ oldPath ].totalPages = totalPages;
+    }
 
     // Create detailed file data (excluding contents)
-    fileDetails.push( createFileDetails( fileData, newPath ) );
+    fileDetails.push( createFileDetails( pageFile, newPath, options.usePermalinks ) );
   } );
 
   return fileDetails;
 };
 
 /**
- * Process a non-first page
+ * Process a non-first index page
  * @param {Object} files - The Metalsmith files object
  * @param {Array} pageFiles - The files for this page
  * @param {number} pageNum - The page number
@@ -45,14 +59,21 @@ export const processPageFiles = ( files, pageFiles, directory, pageNum, totalPag
  * @param {Object} metadata - The global metadata
  * @param {function} debug - The debug function
  */
-export const processPage = ( files, pageFiles, pageNum, totalPages, options, metadata, debug ) => {
+export const processIndexPage = ( files, pageFiles, pageNum, totalPages, options, metadata, debug ) => {
   // Determine page path
   const pagePath = options.outputDir.replace( ':directory', options.directory ).replace( ':num', pageNum );
-  const indexFile = `${ pagePath }/index.html`;
-  debug( 'Processing page %d with path: %s', pageNum, pagePath );
+  let indexFile;
+  if ( options.usePermalinks ) {
+    // Permalink style: /blog/2/index.html
+    indexFile = `${ pagePath }/index.html`;
+  } else {
+    // Non-permalink style: /blog/2.html
+    indexFile = `${ pagePath }.html`;
+  }
+  debug( 'Processing page %d with path: %s', pageNum, indexFile );
 
   // Process files and get file details
-  const fileDetails = processPageFiles( files, pageFiles, options.directory, pageNum, totalPages, debug );
+  const fileDetails = processPageFiles( files, pageFiles, options.directory, pageNum, totalPages, options, debug );
 
   // Get the most recent date from the files on this page
   const mostRecentDate = findMostRecentDate( pageFiles, options.sortBy );
@@ -92,7 +113,8 @@ export const processPage = ( files, pageFiles, pageNum, totalPages, options, met
     nextUrl,
     prevUrl,
     firstUrl,
-    lastUrl
+    lastUrl,
+    options.usePermalinks
   );
 
   // Create index file for this page with pagination metadata compatible with metalsmith-pagination
@@ -113,18 +135,18 @@ export const processPage = ( files, pageFiles, pageNum, totalPages, options, met
 };
 
 /**
- * Process the first page
+ * Process the first index page
  * @param {Object} files - The Metalsmith files object
  * @param {Array} firstIndexFiles - The files for the first page
  * @param {number} totalPages - The total number of pages
  * @param {Object} options - The plugin options
  * @param {function} debug - The debug function
  */
-export const processFirstPage = ( files, firstIndexFiles, totalPages, options, debug ) => {
+export const processFirstIndexPage = ( files, firstIndexFiles, totalPages, options, debug ) => {
   debug( 'Processing first page with %d files', firstIndexFiles.length );
 
   // Process files and get file details
-  const fileDetails = processPageFiles( files, firstIndexFiles, options.directory, 1, totalPages, debug );
+  const fileDetails = processPageFiles( files, firstIndexFiles, options.directory, 1, totalPages, options, debug );
 
   // Generate clean URLs for first page pagination (no previous URL needed)
   const { firstUrl, lastUrl, nextUrl } = generatePaginationUrls(
@@ -149,7 +171,8 @@ export const processFirstPage = ( files, firstIndexFiles, totalPages, options, d
       nextUrl,
       null, // No previous URL for first page
       firstUrl,
-      lastUrl
+      lastUrl,
+      options.usePermalinks
     );
 
     // Add pagination metadata to the first page file

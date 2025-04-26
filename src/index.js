@@ -1,12 +1,13 @@
 // File: src/index.js
 import { normalizeOptions } from './utils/options.js';
 import { filterAndSortFiles } from './utils/fileProcessing.js';
-import { processPage, processFirstPage } from './utils/pageProcessing.js';
+import { processIndexPage, processFirstIndexPage } from './utils/pageProcessing.js';
 
 /**
  * Simple pagination plugin for Metalsmith
- * Creates paginated directories from a source directory of similar files,
- * with pagination metadata compatible with metalsmith-pagination
+ * Generates page index files for paginated content with pagination metadata
+ * compatible with metalsmith-pagination. It does not move content files to
+ * paginated directories, but instead creates index files with pagination metadata.
  *
  * @param {Object} options Configuration options
  * @return {Function} Metalsmith plugin function
@@ -39,17 +40,17 @@ export default function simplePagination( options = {} ) {
       }
       debug( 'Created %d pages with %d items per page', pages.length, options.perPage );
 
-      // Create paginated directories and add pagination metadata for pages after the first
+      // Create pagination index files and add pagination metadata for pages after the first
       for ( let index = 1; index < pages.length; index++ ) {
         const pageFiles = pages[ index ];
         const pageNum = index + 1; // Start at 2
-        processPage( files, pageFiles, pageNum, pages.length, options, metadata, debug );
+        processIndexPage( files, pageFiles, pageNum, pages.length, options, metadata, debug );
       }
 
       // Handle the first page
       if ( pages.length > 0 ) {
         const firstIndexFiles = pages[ 0 ];
-        processFirstPage( files, firstIndexFiles, pages.length, options, debug );
+        processFirstIndexPage( files, firstIndexFiles, pages.length, options, debug );
       }
       debug( 'Pagination process completed' );
       done();
