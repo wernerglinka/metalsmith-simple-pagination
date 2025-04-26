@@ -22,12 +22,12 @@ export const processPageFiles = ( files, pageFiles, directory, pageNum, totalPag
     // Get the basename without extension
     const baseName = fileName.replace( /\.[^/.]+$/, '' );
     // Get the original extension
-    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[ 0 ] : '.html';
+    const extension = fileName.match( /\.[^/.]+$/ ) ? fileName.match( /\.[^/.]+$/ )[0] : '.html';
 
     let newPath;
     if ( options.usePermalinks ) {
       // Create a directory for each blog post (permalink style)
-      newPath = `${ directory }/${ baseName }/index${ extension }`;
+      newPath = `${directory}/${baseName}/index${extension}`;
     } else {
       // Keep the original path (non-permalink style)
       newPath = oldPath;
@@ -38,8 +38,8 @@ export const processPageFiles = ( files, pageFiles, directory, pageNum, totalPag
       moveFile( files, pageFile, oldPath, newPath, pageNum, totalPages, debug );
     } else {
       // Just add pagination metadata without moving the file
-      files[ oldPath ].pageNumber = pageNum;
-      files[ oldPath ].totalPages = totalPages;
+      files[oldPath].pageNumber = pageNum;
+      files[oldPath].totalPages = totalPages;
     }
 
     // Create detailed file data (excluding contents)
@@ -65,10 +65,10 @@ export const processIndexPage = ( files, pageFiles, pageNum, totalPages, options
   let indexFile;
   if ( options.usePermalinks ) {
     // Permalink style: /blog/2/index.html
-    indexFile = `${ pagePath }/index.html`;
+    indexFile = `${pagePath}/index.html`;
   } else {
     // Non-permalink style: /blog/2.html
-    indexFile = `${ pagePath }.html`;
+    indexFile = `${pagePath}.html`;
   }
   debug( 'Processing page %d with path: %s', pageNum, indexFile );
 
@@ -118,7 +118,7 @@ export const processIndexPage = ( files, pageFiles, pageNum, totalPages, options
   );
 
   // Create index file for this page with pagination metadata compatible with metalsmith-pagination
-  files[ indexFile ] = {
+  files[indexFile] = {
     pagination: paginationMetadata,
     // Add for backward compatibility with our plugin
     pageFiles: fileDetails,
@@ -159,7 +159,7 @@ export const processFirstIndexPage = ( files, firstIndexFiles, totalPages, optio
   debug( 'Pagination URLs for first page: first=%s, next=%s, last=%s', firstUrl, nextUrl, lastUrl );
 
   // Update the metadata for the first page file if it exists
-  if ( files[ options.firstIndexFile ] ) {
+  if ( files[options.firstIndexFile] ) {
     debug( 'Adding pagination metadata to first page file: %s', options.firstIndexFile );
 
     // Create pagination metadata
@@ -176,8 +176,8 @@ export const processFirstIndexPage = ( files, firstIndexFiles, totalPages, optio
     );
 
     // Add pagination metadata to the first page file
-    files[ options.firstIndexFile ].pagination = paginationMetadata;
-    files[ options.firstIndexFile ].pageFiles = fileDetails;
+    files[options.firstIndexFile].pagination = paginationMetadata;
+    files[options.firstIndexFile].pageFiles = fileDetails;
   } else {
     debug( 'First page file %s not found, skipping metadata update', options.firstIndexFile );
   }

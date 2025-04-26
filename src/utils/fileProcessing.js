@@ -10,10 +10,10 @@ import { getNestedProperty } from './helpers.js';
 export const filterAndSortFiles = ( files, options, debug ) => {
   // Filter files to only those in the specified directory
   const targetFiles = Object.keys( files )
-    .filter( ( file ) => file.startsWith( `${ options.directory }/` ) )
+    .filter( ( file ) => file.startsWith( `${options.directory}/` ) )
     .map( ( file ) => ( {
       path: file,
-      ...files[ file ]
+      ...files[file]
     } ) );
   debug( 'Found %d files in directory %s', targetFiles.length, options.directory );
   if ( targetFiles.length === 0 ) {
@@ -60,7 +60,7 @@ export const moveFile = ( files, pageFile, oldPath, newPath, pageNum, totalPages
   debug( 'Moving file from %s to %s', oldPath, newPath );
 
   // Create a new file entry with the updated path
-  files[ newPath ] = {
+  files[newPath] = {
     ...pageFile,
     originalPath: oldPath,
     pageNumber: pageNum,
@@ -68,5 +68,5 @@ export const moveFile = ( files, pageFile, oldPath, newPath, pageNum, totalPages
   };
 
   // Remove the old file entry
-  delete files[ oldPath ];
+  delete files[oldPath];
 };

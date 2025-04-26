@@ -11,7 +11,17 @@
  * @param {boolean} usePermalinks - Whether to use permalinks-style URLs
  * @returns {Object} Pagination metadata
  */
-export const createPaginationMetadata = ( directory, pageNum, totalPages, files, nextUrl, prevUrl, firstUrl, lastUrl, usePermalinks = true ) => {
+export const createPaginationMetadata = (
+  directory,
+  pageNum,
+  totalPages,
+  files,
+  nextUrl,
+  prevUrl,
+  firstUrl,
+  lastUrl,
+  usePermalinks = true
+) => {
   return {
     name: directory,
     num: pageNum,
@@ -35,7 +45,7 @@ export const createPaginationMetadata = ( directory, pageNum, totalPages, files,
 export const findMostRecentDate = ( files, sortBy ) => {
   let mostRecent = null;
 
-  files.forEach( file => {
+  files.forEach( ( file ) => {
     const fileDate = getNestedProperty( file, sortBy );
     if ( fileDate instanceof Date ) {
       if ( !mostRecent || fileDate > mostRecent ) {
@@ -54,7 +64,7 @@ export const findMostRecentDate = ( files, sortBy ) => {
  * @returns {*} The value of the property or undefined if not found
  */
 export const getNestedProperty = ( obj, propertyPath ) => {
-  if ( !propertyPath ) return undefined;
+  if ( !propertyPath ) {return undefined;}
   const parts = propertyPath.split( '.' );
   let current = obj;
 
@@ -62,7 +72,7 @@ export const getNestedProperty = ( obj, propertyPath ) => {
     if ( current === undefined || current === null ) {
       return undefined;
     }
-    current = current[ part ];
+    current = current[part];
   }
 
   return current;
@@ -85,7 +95,7 @@ export const createCleanUrl = ( path, usePermalinks = true ) => {
 
   // Ensure the path starts with a slash
   if ( !normalizedPath.startsWith( '/' ) ) {
-    normalizedPath = '/' + normalizedPath;
+    normalizedPath = `/${  normalizedPath}`;
   }
   return normalizedPath;
 };
@@ -113,16 +123,16 @@ export const generatePaginationUrls = ( directory, outputDir, pageNum, totalPage
 
   if ( usePermalinks ) {
     // Permalink style: /blog/, /blog/2/
-    firstUrl = `/${ getPagePath( 1 ) }/`;
-    lastUrl = `/${ getPagePath( totalPages ) }/`;
-    nextUrl = pageNum < totalPages ? `/${ getPagePath( pageNum + 1 ) }/` : null;
-    prevUrl = pageNum > 1 ? `/${ getPagePath( pageNum - 1 ) }/` : null;
+    firstUrl = `/${getPagePath( 1 )}/`;
+    lastUrl = `/${getPagePath( totalPages )}/`;
+    nextUrl = pageNum < totalPages ? `/${getPagePath( pageNum + 1 )}/` : null;
+    prevUrl = pageNum > 1 ? `/${getPagePath( pageNum - 1 )}/` : null;
   } else {
     // Non-permalink style: /blog.html, /blog/2.html
-    firstUrl = `/${ getPagePath( 1 ) }.html`;
-    lastUrl = `/${ getPagePath( totalPages ) }.html`;
-    nextUrl = pageNum < totalPages ? `/${ getPagePath( pageNum + 1 ) }.html` : null;
-    prevUrl = pageNum > 1 ? `/${ getPagePath( pageNum - 1 ) }.html` : null;
+    firstUrl = `/${getPagePath( 1 )}.html`;
+    lastUrl = `/${getPagePath( totalPages )}.html`;
+    nextUrl = pageNum < totalPages ? `/${getPagePath( pageNum + 1 )}.html` : null;
+    prevUrl = pageNum > 1 ? `/${getPagePath( pageNum - 1 )}.html` : null;
   }
 
   return { firstUrl, lastUrl, nextUrl, prevUrl };
@@ -155,7 +165,7 @@ export const createFileDetails = ( pageFile, newPath, usePermalinks = true ) => 
 
   // For non-permalink style, ensure .html extension is present
   if ( !usePermalinks && !normalizedPath.endsWith( '.html' ) ) {
-    normalizedPath = `${ normalizedPath }.html`;
+    normalizedPath = `${normalizedPath}.html`;
   }
 
   fileDetail.path = normalizedPath;

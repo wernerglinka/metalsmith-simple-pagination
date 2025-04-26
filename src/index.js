@@ -16,7 +16,7 @@ export default function simplePagination( options = {} ) {
   options = normalizeOptions( options );
 
   // The main plugin function
-  return function( files, metalsmith, done ) {
+  return function ( files, metalsmith, done ) {
     try {
       const debug = metalsmith.debug( 'metalsmith-simple-pagination' );
       debug( 'Starting pagination process with options: %o', options );
@@ -42,14 +42,14 @@ export default function simplePagination( options = {} ) {
 
       // Create pagination index files and add pagination metadata for pages after the first
       for ( let index = 1; index < pages.length; index++ ) {
-        const pageFiles = pages[ index ];
+        const pageFiles = pages[index];
         const pageNum = index + 1; // Start at 2
         processIndexPage( files, pageFiles, pageNum, pages.length, options, metadata, debug );
       }
 
       // Handle the first page
       if ( pages.length > 0 ) {
-        const firstIndexFiles = pages[ 0 ];
+        const firstIndexFiles = pages[0];
         processFirstIndexPage( files, firstIndexFiles, pages.length, options, debug );
       }
       debug( 'Pagination process completed' );
