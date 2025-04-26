@@ -1,9 +1,16 @@
 {
+  "hooks": {
+    "before:init": ["npm run lint", "npm test"],
+    "after:bump": "auto-changelog --sort-commits date-desc -p --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)'",
+    "after:npm:bump": "npm pack && ls *.tgz",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
   "git": {
-    "requireBranch": "main",
-    "commitMessage": "Release v${version}",
-    "tagName": "v${version}",
-    "tagAnnotation": "Release v${version}"
+    "commitMessage": "Release ${version}",
+    "commitArgs": ["-S"],
+    "tagAnnotation": "Release ${version}",
+    "tagArgs": ["-s"],
+    "changelog": "auto-changelog -u --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)' --stdout -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
   },
   "github": {
     "release": true,
@@ -14,18 +21,5 @@
   },
   "npm": {
     "publish": false
-  },
-  "hooks": {
-    "before:bump": "npm run changelog && git add CHANGELOG.md",
-    "after:git:bump": "npm run update-coverage",
-    "after:release": "echo 'Successfully released ${name} v${version}. You can now publish this to NPM manually.'"
-  },
-  "plugins": {
-    "@release-it/bumper": {
-      "out": {
-        "file": "README.md",
-        "type": "text/plain"
-      }
-    }
   }
 }
