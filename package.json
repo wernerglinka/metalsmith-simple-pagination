@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-simple-pagination",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple pagination plugin for Metalsmith that creates paginated directories from a source directory",
   "type": "module",
   "main": "./lib/index.cjs",
