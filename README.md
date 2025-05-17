@@ -225,6 +225,6 @@ MIT
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-simple-pagination
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-96%25-brightgreen
 [coverage-url]: https://github.com/wernerglinka/metalsmith-simple-pagination/actions/workflows/test.yml
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
