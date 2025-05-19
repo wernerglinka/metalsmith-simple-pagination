@@ -7,7 +7,7 @@ A simple pagination plugin for Metalsmith that creates paginated directories fro
 [![license: MIT][license-badge]][license-url]
 [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/github/wernerglinka/metalsmith-simple-pagination/badge.svg)](https://snyk.io/test/github/wernerglinka/metalsmith-simple-pagination/badge)
+[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-simple-pagination/badge.svg)](https://snyk.io/test/npm/metalsmith-simple-pagination)
 
 ## Features
 
