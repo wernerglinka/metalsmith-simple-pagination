@@ -1,52 +1,60 @@
-// Configuration for ESLint 9.x
+import js from '@eslint/js';
+import globals from 'globals';
+
 export default [
+  js.configs.recommended,
   {
-    ignores: ['lib/**/*', 'test/fixtures/**/*', 'node_modules/**/*', 'coverage/**/*']
-  },
-  {
-    files: ['**/*.js'],
     languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module'
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        ...globals.mocha,
+      },
     },
     rules: {
-      'no-console': [
-        'warn',
-        {
-          allow: ['warn', 'error']
-        }
-      ],
-      'prefer-const': 'error',
-      'no-var': 'error',
-      'no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_'
-        }
-      ],
-      'space-in-parens': ['error', 'always'],
-      eqeqeq: ['error', 'always'],
+      // Error prevention
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-debugger': 'error',
+      'no-alert': 'error',
+
+      // Best practices
       curly: ['error', 'all'],
-      'dot-notation': 'error',
-      'no-multi-assign': 'error',
+      eqeqeq: ['error', 'always'],
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-return-await': 'error',
+      'prefer-promise-reject-errors': 'error',
+      'require-await': 'error',
+
+      // Code style (let Prettier handle formatting)
+      'linebreak-style': ['error', 'unix'],
+
+      // ES6+
+      'no-var': 'error',
+      'prefer-const': ['error', { destructuring: 'all' }],
       'prefer-template': 'error',
-      'prefer-arrow-callback': 'error',
-      'no-else-return': 'error',
-      'no-useless-return': 'error',
-      'no-throw-literal': 'error',
-      'no-await-in-loop': 'warn',
-      'max-depth': ['warn', 4],
-      'max-params': ['warn', 9],
-      complexity: ['warn', 15]
-    }
+      'template-curly-spacing': ['error', 'never'],
+    },
   },
   {
     files: ['test/**/*.js'],
     rules: {
-      'no-console': 'off',
-      'max-depth': 'off',
-      'max-params': 'off',
-      complexity: 'off'
-    }
-  }
+      'no-unused-expressions': 'off', // For chai assertions
+    },
+  },
+  {
+    files: ['test/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+        ...globals.mocha,
+      },
+    },
+    rules: {
+      'no-unused-expressions': 'off', // For chai assertions
+    },
+  },
 ];

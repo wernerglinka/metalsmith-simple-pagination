@@ -16,7 +16,7 @@
     "release": true,
     "repo": "wernerglinka/metalsmith-simple-pagination",
     "releaseName": "metalsmith-simple-pagination ${version}",
-    "tokenRef": "GITHUB_TOKEN",
+    "tokenRef": "GH_TOKEN",
     "assets": ["metalsmith-simple-pagination-${version}.tgz"]
   },
   "npm": {

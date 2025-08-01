@@ -19,7 +19,7 @@ export const defaults = {
   outputDir: ':directory/:num',
   indexLayout: 'blog-index.njk',
   firstIndexFile: 'blog.md',
-  usePermalinks: true
+  usePermalinks: true,
 };
 
 /**
@@ -27,6 +27,6 @@ export const defaults = {
  * @param {Options} [options]
  * @returns {Object}
  */
-export function normalizeOptions( options ) {
-  return Object.assign( {}, defaults, options || {} );
+export function normalizeOptions(options) {
+  return Object.assign({}, defaults, options || {});
 }

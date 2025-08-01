@@ -1,5 +1,3 @@
-/* global describe, it */
-
 const assert = require('node:assert').strict;
 
 // Import the plugin using CommonJS format

@@ -1,11 +1,10 @@
 # metalsmith-simple-pagination
 
-A simple pagination plugin for Metalsmith that creates paginated directories from a source directory of similar files, with pagination metadata compatible with metalsmith-pagination.
+A simple pagination plugin for Metalsmith that creates paginated directories from a source directory
+of similar files, with pagination metadata compatible with metalsmith-pagination.
 
-[![metalsmith:plugin][metalsmith-badge]][metalsmith-url]
-[![npm: version][npm-badge]][npm-url]
-[![license: MIT][license-badge]][license-url]
-[![coverage][coverage-badge]][coverage-url]
+[![metalsmith:plugin][metalsmith-badge]][metalsmith-url] [![npm: version][npm-badge]][npm-url]
+[![license: MIT][license-badge]][license-url] [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
 [![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-simple-pagination/badge.svg)](https://snyk.io/test/npm/metalsmith-simple-pagination)
 
@@ -27,7 +26,8 @@ npm install metalsmith-simple-pagination
 
 ## Usage
 
-This plugin follows the standard Metalsmith plugin pattern and can be used both with ESM and CommonJS.
+This plugin follows the standard Metalsmith plugin pattern and can be used both with ESM and
+CommonJS.
 
 ### ESM (preferred)
 
@@ -42,7 +42,7 @@ metalsmith(__dirname)
       perPage: 10, // Number of posts per page
       sortBy: 'date', // Sort posts by this property (e.g., date or post.date)
       reverse: true, // Sort in descending order (newest first)
-      firstIndexFile: 'blog.md' // First page will update metadata of this file
+      firstIndexFile: 'blog.md', // First page will update metadata of this file
     })
   )
   .build((err) => {
@@ -64,7 +64,7 @@ metalsmith(__dirname)
       perPage: 10, // Number of posts per page
       sortBy: 'date', // Sort posts by this property (e.g., date or post.date)
       reverse: true, // Sort in descending order (newest first)
-      firstIndexFile: 'blog.md' // First page will update metadata of this file
+      firstIndexFile: 'blog.md', // First page will update metadata of this file
     })
   )
   .build((err) => {
@@ -86,9 +86,80 @@ metalsmith(__dirname)
 | firstIndexFile | String  | 'blog.md'         | Name of first page file (e.g., 'blog.md')                   |
 | usePermalinks  | Boolean | true              | Whether to use permalinks-style URLs (/blog/ vs /blog.html) |
 
+## Examples
+
+### Basic Usage
+
+```js
+import Metalsmith from 'metalsmith';
+import simplePagination from 'metalsmith-simple-pagination';
+
+Metalsmith(__dirname)
+  .source('./src')
+  .destination('./build')
+  .use(simplePagination())
+  .build((err) => {
+    if (err) throw err;
+    console.log('Build complete!');
+  });
+```
+
+### With Options
+
+```js
+import Metalsmith from 'metalsmith';
+import simplePagination from 'metalsmith-simple-pagination';
+
+Metalsmith(__dirname)
+  .source('./src')
+  .destination('./build')
+  .use(
+    simplePagination({
+      directory: 'articles',
+      perPage: 5,
+      sortBy: 'publishDate',
+      reverse: true,
+      outputDir: ':directory/page/:num',
+      indexLayout: 'article-list.njk',
+      firstIndexFile: 'articles.md',
+    })
+  )
+  .build((err) => {
+    if (err) throw err;
+    console.log('Articles paginated!');
+  });
+```
+
+### Advanced Usage with Nested Property Sorting
+
+```js
+import Metalsmith from 'metalsmith';
+import simplePagination from 'metalsmith-simple-pagination';
+
+Metalsmith(__dirname)
+  .source('./src')
+  .destination('./build')
+  .use(
+    simplePagination({
+      directory: 'posts',
+      perPage: 8,
+      sortBy: 'post.metadata.publishedAt', // Sort by nested property
+      reverse: true,
+      outputDir: 'blog/page/:num',
+      usePermalinks: false,
+      firstIndexFile: 'index.md',
+    })
+  )
+  .build((err) => {
+    if (err) throw err;
+    console.log('Posts paginated with nested sorting!');
+  });
+```
+
 ## How It Works
 
-This plugin provides a simple way to paginate a collection of files (like blog posts) into separate pages. Here's what it does:
+This plugin provides a simple way to paginate a collection of files (like blog posts) into separate
+pages. Here's what it does:
 
 1. **Sources files**: Finds all files in the specified directory
 2. **Sorts files**: Sorts them by the specified property (e.g., date)
@@ -171,11 +242,13 @@ build/
 │       └── index.md    // Individual post
 ```
 
-At this point the generated index files (`2/index.html` and `3/index.html`)will be empty but their metadata will be populated.
+At this point the generated index files (`2/index.html` and `3/index.html`)will be empty but their
+metadata will be populated.
 
 ## Test Coverage
 
-This plugin maintains high test coverage to ensure reliability. Current test coverage is displayed in the badge at the top of this README.
+This plugin maintains high test coverage to ensure reliability. Current test coverage is displayed
+in the badge at the top of this README.
 
 To run tests locally:
 
@@ -191,7 +264,8 @@ npm run coverage
 
 ## Debug
 
-This plugin uses Metalsmith's debug functionality. To enable debug logs, set the `DEBUG` environment variable:
+This plugin uses Metalsmith's debug functionality. To enable debug logs, set the `DEBUG` environment
+variable:
 
 ```bash
 metalsmith.env('DEBUG', 'metalsmith-simple-pagination')
@@ -226,5 +300,6 @@ MIT
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-simple-pagination
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-96%25-brightgreen
-[coverage-url]: https://github.com/wernerglinka/metalsmith-simple-pagination/actions/workflows/test.yml
+[coverage-url]:
+  https://github.com/wernerglinka/metalsmith-simple-pagination/actions/workflows/test.yml
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue

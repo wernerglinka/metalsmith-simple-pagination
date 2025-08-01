@@ -12,52 +12,52 @@ import { processIndexPage, processFirstIndexPage } from './utils/pageProcessing.
  * @param {Object} options Configuration options
  * @return {Function} Metalsmith plugin function
  */
-export default function simplePagination( options = {} ) {
-  options = normalizeOptions( options );
+export default function simplePagination(options = {}) {
+  options = normalizeOptions(options);
 
   // The main plugin function
-  return function ( files, metalsmith, done ) {
+  return function (files, metalsmith, done) {
     try {
-      const debug = metalsmith.debug( 'metalsmith-simple-pagination' );
-      debug( 'Starting pagination process with options: %o', options );
+      const debug = metalsmith.debug('metalsmith-simple-pagination');
+      debug('Starting pagination process with options: %o', options);
 
       // Get metadata from metalsmith
       const metadata = metalsmith.metadata();
 
       // Filter and sort the files
-      const targetFiles = filterAndSortFiles( files, options, debug );
+      const targetFiles = filterAndSortFiles(files, options, debug);
 
       // If no files found, skip pagination
-      if ( targetFiles.length === 0 ) {
-        debug( 'No files found in directory %s, skipping pagination', options.directory );
+      if (targetFiles.length === 0) {
+        debug('No files found in directory %s, skipping pagination', options.directory);
         return done();
       }
 
       // Group files into chunks for pages
       const pages = [];
-      for ( let i = 0; i < targetFiles.length; i += options.perPage ) {
-        pages.push( targetFiles.slice( i, i + options.perPage ) );
+      for (let i = 0; i < targetFiles.length; i += options.perPage) {
+        pages.push(targetFiles.slice(i, i + options.perPage));
       }
-      debug( 'Created %d pages with %d items per page', pages.length, options.perPage );
+      debug('Created %d pages with %d items per page', pages.length, options.perPage);
 
       // Create pagination index files and add pagination metadata for pages after the first
-      for ( let index = 1; index < pages.length; index++ ) {
+      for (let index = 1; index < pages.length; index++) {
         const pageFiles = pages[index];
         const pageNum = index + 1; // Start at 2
-        processIndexPage( files, pageFiles, pageNum, pages.length, options, metadata, debug );
+        processIndexPage(files, pageFiles, pageNum, pages.length, options, metadata, debug);
       }
 
       // Handle the first page
-      if ( pages.length > 0 ) {
+      if (pages.length > 0) {
         const firstIndexFiles = pages[0];
-        processFirstIndexPage( files, firstIndexFiles, pages.length, options, debug );
+        processFirstIndexPage(files, firstIndexFiles, pages.length, options, debug);
       }
-      debug( 'Pagination process completed' );
+      debug('Pagination process completed');
       done();
-    } catch ( error ) {
+    } catch (error) {
       // Handle unexpected errors
-      console.error( 'Error in metalsmith-simple-pagination plugin:', error );
-      done( error );
+      console.error('Error in metalsmith-simple-pagination plugin:', error);
+      done(error);
     }
   };
 }
