@@ -28,5 +28,5 @@ export const defaults = {
  * @returns {Object}
  */
 export function normalizeOptions(options) {
-  return Object.assign({}, defaults, options || {});
+  return { ...defaults, ...(options || {}) };
 }

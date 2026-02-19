@@ -15,8 +15,10 @@ import { processIndexPage, processFirstIndexPage } from './utils/pageProcessing.
 export default function simplePagination(options = {}) {
   options = normalizeOptions(options);
 
-  // The main plugin function
-  return function (files, metalsmith, done) {
+  // The main plugin function (two-phase pattern)
+  // Phase 1: Configuration processing happens above
+  // Phase 2: File processing happens in this returned function
+  const plugin = function (files, metalsmith, done) {
     try {
       const debug = metalsmith.debug('metalsmith-simple-pagination');
       debug('Starting pagination process with options: %o', options);
@@ -60,4 +62,12 @@ export default function simplePagination(options = {}) {
       done(error);
     }
   };
+
+  // Set function name for debugging
+  Object.defineProperty(plugin, 'name', {
+    value: 'metalsmith-simple-pagination',
+    configurable: true
+  });
+
+  return plugin;
 }

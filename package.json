@@ -30,7 +30,8 @@
     "test:esm": "c8 --include=src/**/*.js mocha test/index.js -t 15000",
     "test:cjs": "c8 --include=src/**/*.js mocha test/cjs.test.cjs -t 15000",
     "test:coverage": "c8 npm test",
-    "depcheck": "depcheck"
+    "depcheck": "depcheck",
+    "audit": "npm audit"
   },
   "repository": {
     "type": "git",
