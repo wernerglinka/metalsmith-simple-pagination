@@ -6,7 +6,6 @@ of similar files, with pagination metadata compatible with metalsmith-pagination
 [![metalsmith:plugin][metalsmith-badge]][metalsmith-url] [![npm: version][npm-badge]][npm-url]
 [![license: MIT][license-badge]][license-url] [![coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-simple-pagination/badge.svg)](https://snyk.io/test/npm/metalsmith-simple-pagination)
 
 ## Features
 
