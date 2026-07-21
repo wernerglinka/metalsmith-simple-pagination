@@ -13,7 +13,7 @@ export const filterAndSortFiles = (files, options, debug) => {
     .filter((file) => file.startsWith(`${options.directory}/`))
     .map((file) => ({
       path: file,
-      ...files[file],
+      ...files[file]
     }));
   debug('Found %d files in directory %s', targetFiles.length, options.directory);
   if (targetFiles.length === 0) {
@@ -41,11 +41,7 @@ export const filterAndSortFiles = (files, options, debug) => {
     }
     return 0;
   });
-  debug(
-    'Files sorted by %s in %s order',
-    options.sortBy,
-    options.reverse ? 'descending' : 'ascending'
-  );
+  debug('Files sorted by %s in %s order', options.sortBy, options.reverse ? 'descending' : 'ascending');
   return targetFiles;
 };
 
@@ -68,7 +64,7 @@ export const moveFile = (files, pageFile, oldPath, newPath, pageNum, totalPages,
     ...pageFile,
     originalPath: oldPath,
     pageNumber: pageNum,
-    totalPages: totalPages,
+    totalPages: totalPages
   };
 
   // Remove the old file entry

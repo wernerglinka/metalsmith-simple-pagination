@@ -5,7 +5,9 @@ of similar files, with pagination metadata compatible with metalsmith-pagination
 
 [![metalsmith:plugin][metalsmith-badge]][metalsmith-url] [![npm: version][npm-badge]][npm-url]
 [![license: MIT][license-badge]][license-url] [![coverage][coverage-badge]][coverage-url]
-[![ESM/CommonJS][modules-badge]][npm-url]
+[![ESM][modules-badge]][npm-url]
+
+This package is **ESM-only** and requires Node >= 22. CommonJS projects on Node 22 can still consume it with `require('metalsmith-simple-pagination')` thanks to Node's `require(esm)` support.
 
 ## Features
 
@@ -15,7 +17,6 @@ of similar files, with pagination metadata compatible with metalsmith-pagination
 - Customizable sorting by any metadata property, including nested properties
 - Preserves all file metadata while adding pagination references
 - Works seamlessly with blog posts and similar collections of files
-- Supports both ESM and CommonJS module formats
 
 ## Installation
 
@@ -25,38 +26,13 @@ npm install metalsmith-simple-pagination
 
 ## Usage
 
-This plugin follows the standard Metalsmith plugin pattern and can be used both with ESM and
-CommonJS.
-
-### ESM (preferred)
+This plugin follows the standard Metalsmith plugin pattern.
 
 ```javascript
-import metalsmith from 'metalsmith';
+import Metalsmith from 'metalsmith';
 import simplePagination from 'metalsmith-simple-pagination';
 
-metalsmith(__dirname)
-  .use(
-    simplePagination({
-      directory: 'blog', // Directory containing files to paginate
-      perPage: 10, // Number of posts per page
-      sortBy: 'date', // Sort posts by this property (e.g., date or post.date)
-      reverse: true, // Sort in descending order (newest first)
-      firstIndexFile: 'blog.md', // First page will update metadata of this file
-    })
-  )
-  .build((err) => {
-    if (err) throw err;
-    console.log('Build complete!');
-  });
-```
-
-### CommonJS
-
-```javascript
-const metalsmith = require('metalsmith');
-const simplePagination = require('metalsmith-simple-pagination');
-
-metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(
     simplePagination({
       directory: 'blog', // Directory containing files to paginate
@@ -93,7 +69,7 @@ metalsmith(__dirname)
 import Metalsmith from 'metalsmith';
 import simplePagination from 'metalsmith-simple-pagination';
 
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .source('./src')
   .destination('./build')
   .use(simplePagination())
@@ -109,7 +85,7 @@ Metalsmith(__dirname)
 import Metalsmith from 'metalsmith';
 import simplePagination from 'metalsmith-simple-pagination';
 
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .source('./src')
   .destination('./build')
   .use(
@@ -135,7 +111,7 @@ Metalsmith(__dirname)
 import Metalsmith from 'metalsmith';
 import simplePagination from 'metalsmith-simple-pagination';
 
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .source('./src')
   .destination('./build')
   .use(
@@ -301,4 +277,4 @@ MIT
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-96%25-brightgreen
 [coverage-url]:
   https://github.com/wernerglinka/metalsmith-simple-pagination/actions/workflows/test.yml
-[modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
+[modules-badge]: https://img.shields.io/badge/module-ESM-blue

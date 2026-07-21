@@ -1,57 +1,30 @@
 import { strict as assert } from 'node:assert';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { describe, it } from 'node:test';
+import Metalsmith from 'metalsmith';
 
 // Import the plugin directly from src for accurate coverage
 import simplePagination from '../src/index.js';
 
-// Get current directory and setup path utilities
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-/**
- * Creates a path resolver for a specific fixture directory
- * @param {string} dir - The fixture directory name
- * @returns {Function} A function that resolves paths within the fixture directory
- */
-const getFixturePath = (dir) => resolve.bind(null, __dirname, `fixtures/${dir}`);
-
-// Get fixture path resolver
-getFixturePath;
-
-// Import metalsmith
-import Metalsmith from 'metalsmith';
-
-describe('metalsmith-simple-pagination (ESM)', function () {
-  // Set timeout for all tests
-  this.timeout(5000);
-
+describe('metalsmith-simple-pagination', () => {
   // Verify ESM module loading
   it('should be importable as an ES module', () => {
-    assert.strictEqual(
-      typeof simplePagination,
-      'function',
-      'Plugin should be a function when imported with ESM'
-    );
-    assert.strictEqual(
-      typeof simplePagination(),
-      'function',
-      'Plugin should return a function when called'
-    );
+    assert.strictEqual(typeof simplePagination, 'function', 'Plugin should be a function when imported with ESM');
+    assert.strictEqual(typeof simplePagination(), 'function', 'Plugin should return a function when called');
   });
 
   describe('Basic Functionality', () => {
-    it('should run without errors', (done) => {
+    it('should run without errors', (_t, done) => {
       // Create mock blog posts
       const files = {
         'blog/post1.md': {
           title: 'Post 1',
           date: new Date('2022-01-01'),
-          contents: Buffer.from('# Post 1'),
+          contents: Buffer.from('# Post 1')
         },
         'blog.md': {
           title: 'Blog Index',
-          contents: Buffer.from('# Blog'),
-        },
+          contents: Buffer.from('# Blog')
+        }
       };
 
       // Create metalsmith instance
@@ -68,33 +41,33 @@ describe('metalsmith-simple-pagination (ESM)', function () {
       });
     });
 
-    it('should handle usePermalinks=false option', (done) => {
+    it('should handle usePermalinks=false option', (_t, done) => {
       // Create mock blog posts
       const files = {
         'blog/post1.md': {
           title: 'Post 1',
           date: new Date('2022-01-01'),
-          contents: Buffer.from('# Post 1'),
+          contents: Buffer.from('# Post 1')
         },
         'blog/post2.md': {
           title: 'Post 2',
           date: new Date('2022-01-02'),
-          contents: Buffer.from('# Post 2'),
+          contents: Buffer.from('# Post 2')
         },
         'blog/post3.md': {
           title: 'Post 3',
           date: new Date('2022-01-03'),
-          contents: Buffer.from('# Post 3'),
+          contents: Buffer.from('# Post 3')
         },
         'blog/post4.md': {
           title: 'Post 4',
           date: new Date('2022-01-04'),
-          contents: Buffer.from('# Post 4'),
+          contents: Buffer.from('# Post 4')
         },
         'blog.md': {
           title: 'Blog Index',
-          contents: Buffer.from('# Blog'),
-        },
+          contents: Buffer.from('# Blog')
+        }
       };
 
       // Create metalsmith instance
@@ -103,7 +76,7 @@ describe('metalsmith-simple-pagination (ESM)', function () {
       // Run the plugin with usePermalinks=false
       simplePagination({
         perPage: 2,
-        usePermalinks: false,
+        usePermalinks: false
       })(files, metalsmith, (err) => {
         if (err) {
           return done(err);
@@ -122,23 +95,23 @@ describe('metalsmith-simple-pagination (ESM)', function () {
       });
     });
 
-    it('should handle custom firstIndexFile option', (done) => {
+    it('should handle custom firstIndexFile option', (_t, done) => {
       // Create mock blog posts
       const files = {
         'blog/post1.md': {
           title: 'Post 1',
           date: new Date('2022-01-01'),
-          contents: Buffer.from('# Post 1'),
+          contents: Buffer.from('# Post 1')
         },
         'blog/post2.md': {
           title: 'Post 2',
           date: new Date('2022-01-02'),
-          contents: Buffer.from('# Post 2'),
+          contents: Buffer.from('# Post 2')
         },
         'custom-blog-index.md': {
           title: 'Custom Blog Index',
-          contents: Buffer.from('# Custom Blog'),
-        },
+          contents: Buffer.from('# Custom Blog')
+        }
       };
 
       // Create metalsmith instance
@@ -146,7 +119,7 @@ describe('metalsmith-simple-pagination (ESM)', function () {
 
       // Run the plugin with custom firstIndexFile
       simplePagination({
-        firstIndexFile: 'custom-blog-index.md',
+        firstIndexFile: 'custom-blog-index.md'
       })(files, metalsmith, (err) => {
         if (err) {
           return done(err);
@@ -156,10 +129,7 @@ describe('metalsmith-simple-pagination (ESM)', function () {
           // Check that custom-blog-index.md got pagination metadata
           assert(files['custom-blog-index.md'].pagination !== undefined, 'pagination should exist');
           assert.strictEqual(files['custom-blog-index.md'].pagination.num, 1);
-          assert(
-            Array.isArray(files['custom-blog-index.md'].pagination.files),
-            'pagination.files should be an array'
-          );
+          assert(Array.isArray(files['custom-blog-index.md'].pagination.files), 'pagination.files should be an array');
           assert.strictEqual(files['custom-blog-index.md'].pagination.files.length, 2);
 
           done();
@@ -169,17 +139,17 @@ describe('metalsmith-simple-pagination (ESM)', function () {
       });
     });
 
-    it('should handle no pagination needed (empty directory)', (done) => {
+    it('should handle no pagination needed (empty directory)', (_t, done) => {
       // Create files with no blog posts
       const files = {
         'other/file.md': {
           title: 'Other File',
-          contents: Buffer.from('# Other File'),
+          contents: Buffer.from('# Other File')
         },
         'blog.md': {
           title: 'Blog Index',
-          contents: Buffer.from('# Blog'),
-        },
+          contents: Buffer.from('# Blog')
+        }
       };
 
       // Create metalsmith instance
@@ -195,10 +165,7 @@ describe('metalsmith-simple-pagination (ESM)', function () {
           // No blog files should be created or moved
           assert(files['other/file.md'] !== undefined, 'other/file.md should exist');
           assert(files['blog.md'] !== undefined, 'blog.md should exist');
-          assert(
-            files['blog.md'].pagination === undefined,
-            'blog.md should not have pagination metadata'
-          );
+          assert(files['blog.md'].pagination === undefined, 'blog.md should not have pagination metadata');
 
           done();
         } catch (error) {
@@ -207,35 +174,35 @@ describe('metalsmith-simple-pagination (ESM)', function () {
       });
     });
 
-    it('should preserve metalsmith global metadata', (done) => {
+    it('should preserve metalsmith global metadata', (_t, done) => {
       // Create mock blog posts
       const files = {
         'blog/post1.md': {
           title: 'Post 1',
           date: new Date('2022-01-01'),
-          contents: Buffer.from('# Post 1'),
+          contents: Buffer.from('# Post 1')
         },
         'blog/post2.md': {
           title: 'Post 2',
           date: new Date('2022-01-02'),
-          contents: Buffer.from('# Post 2'),
+          contents: Buffer.from('# Post 2')
         },
         'blog.md': {
           title: 'Blog Index',
-          contents: Buffer.from('# Blog'),
-        },
+          contents: Buffer.from('# Blog')
+        }
       };
 
       // Create metalsmith instance with global metadata
       const globalMetadata = {
         siteName: 'Test Site',
-        siteUrl: 'https://example.com',
+        siteUrl: 'https://example.com'
       };
       const metalsmith = Metalsmith('/tmp').metadata(globalMetadata);
 
       // Run the plugin with perPage=1 to create multiple pages
       simplePagination({
-        perPage: 1,
+        perPage: 1
       })(files, metalsmith, (err) => {
         if (err) {
           return done(err);

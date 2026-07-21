@@ -32,7 +32,7 @@ export const createPaginationMetadata = (
     previous: prevUrl || null,
     first: firstUrl,
     last: lastUrl,
-    usePermalinks: usePermalinks, // Add flag to indicate URL style for templates
+    usePermalinks: usePermalinks // Add flag to indicate URL style for templates
   };
 };
 
@@ -111,13 +111,7 @@ export const createCleanUrl = (path, usePermalinks = true) => {
  * @param {boolean} usePermalinks - Whether to use permalinks-style URLs
  * @returns {Object} Object with firstUrl, lastUrl, nextUrl, prevUrl
  */
-export const generatePaginationUrls = (
-  directory,
-  outputDir,
-  pageNum,
-  totalPages,
-  usePermalinks
-) => {
+export const generatePaginationUrls = (directory, outputDir, pageNum, totalPages, usePermalinks) => {
   // Format URLs based on permalink style
   let firstUrl, lastUrl, nextUrl, prevUrl;
 
@@ -155,7 +149,7 @@ export const generatePaginationUrls = (
  */
 export const createFileDetails = (pageFile, newPath, usePermalinks = true) => {
   const fileDetail = {
-    ...pageFile,
+    ...pageFile
   };
   delete fileDetail.contents; // Contents not needed in the metadata
 

@@ -1,10 +1,5 @@
 import { moveFile } from './fileProcessing.js';
-import {
-  findMostRecentDate,
-  generatePaginationUrls,
-  createPaginationMetadata,
-  createFileDetails,
-} from './helpers.js';
+import { findMostRecentDate, generatePaginationUrls, createPaginationMetadata, createFileDetails } from './helpers.js';
 
 /**
  * Helper function to process files for a page
@@ -17,15 +12,7 @@ import {
  * @param {function} debug - The debug function
  * @returns {Array} Array of file details
  */
-export const processPageFiles = (
-  files,
-  pageFiles,
-  directory,
-  pageNum,
-  totalPages,
-  options,
-  debug
-) => {
+export const processPageFiles = (files, pageFiles, directory, pageNum, totalPages, options, debug) => {
   const fileDetails = [];
 
   // Process each file in the page
@@ -72,19 +59,9 @@ export const processPageFiles = (
  * @param {Object} metadata - The global metadata
  * @param {function} debug - The debug function
  */
-export const processIndexPage = (
-  files,
-  pageFiles,
-  pageNum,
-  totalPages,
-  options,
-  metadata,
-  debug
-) => {
+export const processIndexPage = (files, pageFiles, pageNum, totalPages, options, metadata, debug) => {
   // Determine page path
-  const pagePath = options.outputDir
-    .replace(':directory', options.directory)
-    .replace(':num', pageNum);
+  const pagePath = options.outputDir.replace(':directory', options.directory).replace(':num', pageNum);
   let indexFile;
   if (options.usePermalinks) {
     // Permalink style: /blog/2/index.html
@@ -96,15 +73,7 @@ export const processIndexPage = (
   debug('Processing page %d with path: %s', pageNum, indexFile);
 
   // Process files and get file details
-  const fileDetails = processPageFiles(
-    files,
-    pageFiles,
-    options.directory,
-    pageNum,
-    totalPages,
-    options,
-    debug
-  );
+  const fileDetails = processPageFiles(files, pageFiles, options.directory, pageNum, totalPages, options, debug);
 
   // Get the most recent date from the files on this page
   const mostRecentDate = findMostRecentDate(pageFiles, options.sortBy);
@@ -115,7 +84,7 @@ export const processIndexPage = (
     atime: now,
     mtime: now,
     ctime: now,
-    birthtime: now,
+    birthtime: now
   };
 
   // Generate clean URLs for pagination
@@ -160,7 +129,7 @@ export const processIndexPage = (
     // Include global metadata if available
     ...(metadata || {}),
     layout: options.indexLayout,
-    contents: Buffer.from(''),
+    contents: Buffer.from('')
   };
   debug('Created index file: %s', indexFile);
 };
@@ -177,15 +146,7 @@ export const processFirstIndexPage = (files, firstIndexFiles, totalPages, option
   debug('Processing first page with %d files', firstIndexFiles.length);
 
   // Process files and get file details
-  const fileDetails = processPageFiles(
-    files,
-    firstIndexFiles,
-    options.directory,
-    1,
-    totalPages,
-    options,
-    debug
-  );
+  const fileDetails = processPageFiles(files, firstIndexFiles, options.directory, 1, totalPages, options, debug);
 
   // Generate clean URLs for first page pagination (no previous URL needed)
   const { firstUrl, lastUrl, nextUrl } = generatePaginationUrls(

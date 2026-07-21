@@ -19,7 +19,7 @@ export const defaults = {
   outputDir: ':directory/:num',
   indexLayout: 'blog-index.njk',
   firstIndexFile: 'blog.md',
-  usePermalinks: true,
+  usePermalinks: true
 };
 
 /**
